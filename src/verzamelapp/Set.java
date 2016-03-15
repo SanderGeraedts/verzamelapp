@@ -58,7 +58,11 @@ public class Set implements Comparable<Set>{
     
     @Override
     public int compareTo(Set other) {
-        int result = compare(this.jaar, other.jaar);
-        return result;
+        if(this.jaar == other.jaar){
+            return 0;
+        } else {
+            int result = compare(this.jaar, other.jaar);
+            return result;
+        }
     }
 }

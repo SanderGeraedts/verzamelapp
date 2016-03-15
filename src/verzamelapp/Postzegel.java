@@ -36,8 +36,7 @@ public class Postzegel extends Voorwerp implements Comparable<Postzegel>{
         this.breedte = breedte;
     }
 
-    public Postzegel(double lengte, double breedte, List<Set> sets) {
-        super(sets);
+    public Postzegel(double lengte, double breedte){
         this.lengte = lengte;
         this.breedte = breedte;
     }

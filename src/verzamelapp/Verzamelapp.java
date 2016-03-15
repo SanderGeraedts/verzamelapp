@@ -12,13 +12,13 @@ import java.util.*;
  * @author Sander Geraedts - Code Panda
  */
 public class Verzamelapp {
-    private static List<Set> sets;
+    private static Registry registry;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        sets = new ArrayList<>();
+        registry = new Registry();
         
         start();
     }
@@ -41,6 +41,7 @@ public class Verzamelapp {
         System.out.println("6: Bekijk alle voorwerpen gesorteerd op jaar");
         System.out.println("7: Bekijk alle postzegels gesorteerd op grootte");
         System.out.println("8: Exit");
+        System.out.println("9: TestDatabase");
     }
     
     private static void chooseMenu() {
@@ -73,6 +74,9 @@ public class Verzamelapp {
                 case 8:
                     exit();
                     break;
+                case 9:
+                    testDatabase();
+                    break;
                 default:
                     restart();
             }
@@ -91,7 +95,7 @@ public class Verzamelapp {
         System.out.println("Kies een van de onderstaande sets:");
         
         while(failed) {
-            for(Set s : sets) {
+            for(Set s : registry.getSets()) {
                 System.out.printf("%d: %s %n", index, s.toString());
                 index++;
             }
@@ -100,9 +104,9 @@ public class Verzamelapp {
                 Scanner input = new Scanner(System.in, "UTF-8");
                 keuze = input.nextInt();
 
-                if(keuze >= 0 && sets.size() >= keuze) {
+                if(keuze >= 0 && registry.getSets().size() >= keuze) {
                     failed = false;
-                    set = sets.get(keuze);
+                    set = registry.getSets().get(keuze);
                     return set;
                 } else {
                     System.out.println("Verkeerde input, kies een juist nummer.");
@@ -139,8 +143,8 @@ public class Verzamelapp {
         }
         
         Set set = new Set(naam, jaar);
-        sets.add(set);
-        for(Set s : sets){
+        registry.getSets().add(set);
+        for(Set s : registry.getSets()){
             System.out.println(s.toString());
         }
         System.out.println("--------------------------------");
@@ -149,7 +153,7 @@ public class Verzamelapp {
     
     private static void addPostzegel() {
         System.out.println("--------------------------------");
-        if(!sets.isEmpty()) {
+        if(!registry.getSets().isEmpty()) {
             Set set = null;
             double lengte = 0;
             double breedte = 0;
@@ -181,9 +185,7 @@ public class Verzamelapp {
                     System.out.println("Verkeerde input, gebruik a.u.b. alleen nummers.");
                 }
             }
-            List<Set> inputsets = new ArrayList<>();
-            inputsets.add(set);
-            Postzegel postzegel = new Postzegel(lengte, breedte, inputsets);
+            Postzegel postzegel = new Postzegel(lengte, breedte);
             set.addVoorwerp(postzegel);            
         } else {
             System.out.println("Voeg a.u.b. eerst een set toe");
@@ -196,7 +198,7 @@ public class Verzamelapp {
     
     private static void addBierdop() {
         System.out.println("--------------------------------");
-        if(!sets.isEmpty()) {
+        if(!registry.getSets().isEmpty()) {
             Set set = null;
             String merk;
             
@@ -206,10 +208,7 @@ public class Verzamelapp {
             Scanner input = new Scanner(System.in, "UTF-8");
             merk = input.nextLine();
             
-            List<Set> setInput = new ArrayList<>();
-            setInput.add(set);
-            
-            Bierdopje bierdopje = new Bierdopje(merk, setInput);
+            Bierdopje bierdopje = new Bierdopje(merk);
             set.addVoorwerp(bierdopje);
         } else {
             System.out.println("Voeg a.u.b. eerst een set toe");
@@ -224,7 +223,7 @@ public class Verzamelapp {
         System.out.println("Kies een bierdopje om te verwijderen:");
         List<Bierdopje> bierdopjes = new ArrayList<>();
         Bierdopje remove = null;
-        for(Set set : sets) {
+        for(Set set : registry.getSets()) {
             for(Voorwerp voorwerp : set.getVoorwerpen()) {
                 if(voorwerp instanceof Bierdopje) {
                     bierdopjes.add((Bierdopje) voorwerp);
@@ -246,7 +245,7 @@ public class Verzamelapp {
                     int keuze = input.nextInt();
                     if(keuze >= 0 && keuze < bierdopjes.size()){
                         remove = bierdopjes.get(keuze);
-                        for(Set set : sets) {
+                        for(Set set : registry.getSets()) {
                             if(set.getVoorwerpen().contains(remove)){
                                 set.getVoorwerpen().remove(remove);
                                 failed = false;
@@ -270,7 +269,7 @@ public class Verzamelapp {
         System.out.println("Kies een postzegel om te verwijderen:");
         List<Postzegel> postzegels = new ArrayList<>();
         Postzegel remove = null;
-        for(Set set : sets) {
+        for(Set set : registry.getSets()) {
             for(Voorwerp voorwerp : set.getVoorwerpen()) {
                 if(voorwerp instanceof Postzegel) {
                     postzegels.add((Postzegel) voorwerp);
@@ -292,7 +291,7 @@ public class Verzamelapp {
                     int keuze = input.nextInt();
                     if(keuze >= 0 && keuze < postzegels.size()){
                         remove = postzegels.get(keuze);
-                        for(Set set : sets) {
+                        for(Set set : registry.getSets()) {
                             if(set.getVoorwerpen().contains(remove)){
                                 set.getVoorwerpen().remove(remove);
                                 failed = false;
@@ -314,8 +313,8 @@ public class Verzamelapp {
     
     private static void showVoorwerpen() {
         System.out.println("Voorwerpen: ");
-        Collections.sort(sets);
-        for(Set set : sets) {
+        Collections.sort(registry.getSets());
+        for(Set set : registry.getSets()) {
             System.out.println(set.toString());
             for(Voorwerp voorwerp : set.getVoorwerpen()) {
                 System.out.println("- " + voorwerp.toString());
@@ -331,7 +330,7 @@ public class Verzamelapp {
     private static void showPostzegels() {
         System.out.println("Postzegels:");
         List<Postzegel> postzegels = new ArrayList<>();
-        for(Set set : sets) {
+        for(Set set : registry.getSets()) {
             for(Voorwerp voorwerp : set.getVoorwerpen()) {
                 if(voorwerp instanceof Postzegel) {
                     postzegels.add((Postzegel) voorwerp);
@@ -363,5 +362,9 @@ public class Verzamelapp {
     private static void restart() {
         System.out.println("--------------------------------");
         start();
+    }
+
+    private static void testDatabase() {
+        Database database = new Database(new Properties());
     }
 }

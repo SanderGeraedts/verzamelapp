@@ -22,8 +22,7 @@ public class Bierdopje extends Voorwerp{
         this.merk = merk;
     }
 
-    public Bierdopje(String merk, List<Set> sets) {
-        super(sets);
+    public Bierdopje(String merk) {
         this.merk = merk;
     }
     
